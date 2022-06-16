@@ -8,6 +8,7 @@ import javax.ws.rs.Produces;
 public class HelloResource {
     @GET
     @Produces("text/plain")
+    //hùng
     public String hello() {
         return "Hello, World!";
     }
