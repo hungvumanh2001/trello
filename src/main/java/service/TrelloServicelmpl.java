@@ -10,12 +10,16 @@ import java.util.List;
 
 public class TrelloServicelmpl implements TrelloService {
     private static List<User> userList;
+    private static List<Post> postList;
     static {
         userList = new ArrayList<>();
         userList.add(new User(1,"Cao1","cao1","cao1@gmail","levancao1","DongAnh1","001","Admin","Khong"));
         userList.add(new User(2,"Cao2","cao12","cao2@gmail","levancao2","DongAnh2","002","client","Khong"));
         userList.add(new User(3,"Cao3","cao123","cao3@gmail","levancao3","DongAnh3","003","client","Khong"));
 
+        postList = new ArrayList<>();
+        postList.add(new Post(1,"cao",1,"cao","cao","cao","cao","cao1","cao1"));
+        postList.add(new Post(2,"cao",2,"cao","cao","cao","cao","cao2","cao2"));
     }
     private String jdbcUrl="jdbc:mysql://localhost:3306/trello";
     private String username="root";
@@ -48,18 +52,23 @@ public class TrelloServicelmpl implements TrelloService {
     }
 
     @Override
-    public void save(Post post) {
+    public List<Post> findAllPost() {
+        return new ArrayList<>(postList);
+    }
 
+    @Override
+    public void save(Post post) {
+        postList.add(post);
     }
 
     @Override
     public Post findById(int id) {
-        return null;
+        return postList.get(id);
     }
 
     @Override
     public void update(int id, Post post) {
-
+        postList.add(id, post);
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface TrelloService {
     List<User> findAll();
+    List<Post> findAllPost();
     void save(Post post);
     Post findById(int id);
     void update(int id,Post post);
