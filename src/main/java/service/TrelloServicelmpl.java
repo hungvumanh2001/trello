@@ -5,8 +5,11 @@ import model.User;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TrelloServicelmpl implements TrelloService {
     private static List<User> userList;
@@ -18,14 +21,15 @@ public class TrelloServicelmpl implements TrelloService {
         userList.add(new User(3,"Cao3","cao123","cao3@gmail","levancao3","DongAnh3","003","client","Khong"));
 
         postList = new ArrayList<>();
-        postList.add(new Post(1,"cao",1,"cao","cao","cao","cao","cao1","cao1"));
-        postList.add(new Post(2,"cao",2,"cao","cao","cao","cao","cao2","cao2"));
+        postList.add(new Post(1,"Cao",1,"cao","cao","cao","cao","cao1","cao1"));
+        postList.add(new Post(2,"Tuan",2,"tuan","tuan","tuan","tuan","cao2","cao2"));
+        postList.add(new Post(2,"Linh",2,"linh","linh","linh","linh","cao2","cao2"));
     }
     private String jdbcUrl="jdbc:mysql://localhost:3306/trello";
     private String username="root";
     private String password="cao0974782521";
 
-    private static final String GET_CUSTOMER_ALL="SELECT * FROM customer";
+    private static final String GET_CUSTOMER_ALL="SELECT * FROM post";
     private static final String INSERT_CUSTOMER="INSERT INTO customer(namecr,address,email) VALUE(?,?,?)";
     private static final String GET_CUSTOMER_GETBYID="SELECT * FROM customer WHERE id=?";
     private static final String UPDATE_CUSTOMER="UPDATE customer SET namecr=?,address=?,email=? where id=?; ";
@@ -63,26 +67,61 @@ public class TrelloServicelmpl implements TrelloService {
 
     @Override
     public Post findById(int id) {
-        return postList.get(id);
+        for (Post post: postList
+        ) {
+            if (post.getId()==id)
+                return post;
+        }
+        return null;
+    }
+
+    @Override
+    public int findIndexById(int id) {
+        int index = -1;
+        for (int i=0;i<postList.size();i++)
+        {
+            if (postList.get(i).getId()==id)
+            {
+                index=i;
+            }
+        }
+        return index;
+    }
+
+    @Override
+    public Post delete(int id) {
+        return postList.remove(findIndexById(id));
     }
 
     @Override
     public void update(int id, Post post) {
-        postList.add(id, post);
+        int idexOf=findIndexById(id);
+        postList.set(idexOf,post);
     }
 
     @Override
     public void remove(int id) {
-
+        postList.remove(id);
     }
 
     @Override
     public List<Post> findByName(String name) {
-        return null;
+        List<Post> list = new ArrayList<>();
+        List<Post> searchList = new ArrayList<>();
+        for (Post item:list
+             ) {
+            if (item.getTitle().toLowerCase().contains(name.toLowerCase().trim()))
+            {
+                Post post = item;
+                searchList.add(post);
+            }
+
+        }
+        return searchList;
     }
 //    @Override
-//    public List<Customer> findAll() {
-//        List<Customer>customerslist=new ArrayList<>();
+//    public List<Post> findAllPost() {
+//        List<Post> customerslist=new ArrayList<>();
 //        try
 //        {
 //            Connection connection=getConnection();
@@ -91,7 +130,7 @@ public class TrelloServicelmpl implements TrelloService {
 //            ResultSet rs=preparedStatement.executeQuery();
 //            while(rs.next())
 //            {
-//                Customer customers=new Customer(rs.getInt("Id"),rs.getString("namecr"),rs.getString("address"),rs.getString("email"));
+//                Post customers=new Post(rs.getInt("id"),rs.getString("title"),rs.getInt("date_created"),rs.getString("content"),rs.getString("description"),rs.getString("authority"),rs.getString("status"),rs.getString("user_id"),rs.getString("type_id"));
 //                customerslist.add(customers);
 //            }
 //
