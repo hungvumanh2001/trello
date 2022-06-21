@@ -3,40 +3,24 @@ package service;
 import model.Post;
 import model.User;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class TrelloServicelmpl implements TrelloService {
-    private static List<User> userList;
-    static {
-        userList = new ArrayList<>();
-        userList.add(new User(1,"Cao1","cao1","cao1@gmail","levancao1","DongAnh1","001","Admin","Khong"));
-        userList.add(new User(2,"Cao2","cao12","cao2@gmail","levancao2","DongAnh2","002","client","Khong"));
-        userList.add(new User(3,"Cao3","cao123","cao3@gmail","levancao3","DongAnh3","003","client","Khong"));
-
+    public TrelloServicelmpl() {
     }
-    private String jdbcUrl="jdbc:mysql://localhost:3306/trello";
-    private String username="root";
-    private String password="cao0974782521";
 
-    private static final String GET_CUSTOMER_ALL="SELECT * FROM customer";
-    private static final String INSERT_CUSTOMER="INSERT INTO customer(namecr,address,email) VALUE(?,?,?)";
-    private static final String GET_CUSTOMER_GETBYID="SELECT * FROM customer WHERE id=?";
-    private static final String UPDATE_CUSTOMER="UPDATE customer SET namecr=?,address=?,email=? where id=?; ";
-    private static final String DELETE_CUSTOMER="DELETE FROM customer WHERE Id=?";
-
-    private Connection getConnection()
-    {
-        Connection connection=null;
-        try
-        {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            connection = DriverManager.getConnection(jdbcUrl, username, password);
-        }
-        catch (Exception e)
-        {
+    protected Connection getConnection() {
+        Connection connection = null;
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+            connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/trello?useSSL=false", "root", "06102001");
+        } catch (SQLException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return connection;
@@ -44,12 +28,69 @@ public class TrelloServicelmpl implements TrelloService {
 
     @Override
     public List<User> findAll() {
-         return new ArrayList<>(userList);
+        List<User> users = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("Select * from user");) {
+            System.out.println(preparedStatement);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String username = rs.getString("username");
+                String password = rs.getString("password");
+                String email = rs.getString("email");
+                String fullname = rs.getString("fullname");
+                String address = rs.getString("address");
+                String phonenumber = rs.getString("phonenumber");
+                String role = rs.getString("role");
+                String status = rs.getString("status");
+                users.add(new User(id, username, password, email, fullname, address, phonenumber, role, status));
+            }
+        } catch (SQLException e) {
+        }
+        return users;
     }
 
     @Override
-    public void save(Post post) {
+    public void add(User user) {
+        try (Connection connection = getConnection(); PreparedStatement preparedStatement = connection.prepareStatement("Insert into user(id, username, password, email, fullname, address, phonenumber, role, status) value(?, ?, ?, ?, ?, ?, ?, ?, ?)");) {
+            System.out.println(preparedStatement);
+            preparedStatement.setInt(1, user.getId());
+            preparedStatement.setString(2, user.getUsername());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setString(4, user.getEmail());
+            preparedStatement.setString(5, user.getFullname());
+            preparedStatement.setString(6, user.getAddress());
+            preparedStatement.setString(7, user.getPhonenumber());
+            preparedStatement.setString(8, user.getRole());
+            preparedStatement.setString(9, user.getStatus());
+            System.out.println(preparedStatement);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+        }
+    }
 
+    @Override
+    public User checkLogin(String u, String p) {
+        User userLogin = null;
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("Select * from user where username = ? and password = ?");) {
+            preparedStatement.setString(1, u);
+            preparedStatement.setString(2, p);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String email = rs.getString("email");
+                String fullname = rs.getString("fullname");
+                String address = rs.getString("address");
+                String phonenumber = rs.getString("phonenumber");
+                String role = rs.getString("role");
+                String status = rs.getString("status");
+                userLogin = new User(id, u, p, email, fullname, address, phonenumber, role, status);
+            }
+        }
+        catch (SQLException e) {
+        }
+        return userLogin;
     }
 
     @Override
@@ -58,7 +99,7 @@ public class TrelloServicelmpl implements TrelloService {
     }
 
     @Override
-    public void update(int id, Post post) {
+    public void update(int id, User user) {
 
     }
 
@@ -71,126 +112,5 @@ public class TrelloServicelmpl implements TrelloService {
     public List<Post> findByName(String name) {
         return null;
     }
-//    @Override
-//    public List<Customer> findAll() {
-//        List<Customer>customerslist=new ArrayList<>();
-//        try
-//        {
-//            Connection connection=getConnection();
-//            PreparedStatement preparedStatement = connection.prepareStatement(GET_CUSTOMER_ALL);
-//            //add dependenci
-//            ResultSet rs=preparedStatement.executeQuery();
-//            while(rs.next())
-//            {
-//                Customer customers=new Customer(rs.getInt("Id"),rs.getString("namecr"),rs.getString("address"),rs.getString("email"));
-//                customerslist.add(customers);
-//            }
-//
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//            //thiếu logger
-//            //log4j để ghi log
-//        }
-//        return customerslist;
-//    }
-//
-//    @Override
-//    public void save(Customer customer) {
-//        try
-//        {
-//            Connection connection=getConnection();
-//            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_CUSTOMER);
-//            preparedStatement.setString(1,customer.getName());
-//            preparedStatement.setString(2,customer.getAddress());
-//            preparedStatement.setString(3,customer.getEmail());
-//            preparedStatement.setInt(4, customer.getId());
-//
-//            //câu lệnh này dùng để update bản cập nhật mới
-//
-//            preparedStatement.executeUpdate();
-//
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    @Override
-//    public Customer findById(int id) {
-//        Customer customers=null;
-//        try{
-//            Connection connection=getConnection();
-//            PreparedStatement preparedStatement = connection.prepareStatement(GET_CUSTOMER_GETBYID);
-//            preparedStatement.setInt(1,id);
-//            ResultSet rs=preparedStatement.executeQuery();
-//            while(rs.next())
-//            {
-//                customers=new Customer(rs.getInt("Id"),rs.getString("namecr"),rs.getString("address"),rs.getString("email"));
-//            }
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
-//
-//        return customers;
-//    }
-//
-//    @Override
-//    public void update(Customer customer) {
-//        try
-//        {
-//            Connection connection=getConnection();
-//            PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_CUSTOMER);
-//            preparedStatement.setString(1,customer.getName());
-//            preparedStatement.setString(2,customer.getAddress());
-//            preparedStatement.setString(3,customer.getEmail());
-//            preparedStatement.setInt(4, customer.getId());
-//
-//            //câu lệnh này dùng để update bản cập nhật mới
-//
-//            preparedStatement.executeUpdate();
-//
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
-//
-//    }
-//
-//    @Override
-//    public void remove(int id) {
-//        try
-//        {
-//            Connection connection=getConnection();
-//            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_CUSTOMER);
-//            preparedStatement.setInt(1,id);
-//            preparedStatement.executeUpdate();
-//        }
-//        catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    @Override
-//    public void Insert(Customer customer) {
-//        try
-//        {
-//            Connection connection=getConnection();
-//            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CUSTOMER);
-//            preparedStatement.setString(1,customer.getName());
-//            preparedStatement.setString(2,customer.getAddress());
-//            preparedStatement.setString(3,customer.getEmail());
-//            preparedStatement.executeUpdate();
-//        }catch (Exception e)
-//        {
-//            e.printStackTrace();
-//        }
-//    }
 
 }
