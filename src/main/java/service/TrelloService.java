@@ -9,8 +9,7 @@ public interface TrelloService {
     List<User> findAll();
     void add(User user);
     User checkLogin(String username, String password);
-    Post findById(int id);
+    List<User> findByName(String username);
     void update(int id,User user);
     void remove(int id);
-    List<Post> findByName(String name);
 }

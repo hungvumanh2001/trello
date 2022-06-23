@@ -30,11 +30,31 @@ public class TrelloServlet extends HttpServlet {
             case "signout":
                 checkSignout(request, response);
                 break;
+            case "listaccount":
+                showListUser(request, response);
+                break;
             default:
                 showHome(request, response);
         }
 
 }
+
+    private void showListUser(HttpServletRequest request, HttpServletResponse response) {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("user/list.jsp");
+        List<User> users = trelloServicelmpl.findAll();
+        String search = request.getParameter("namesearch");
+        if(search!=null){
+            users = trelloServicelmpl.findByName("%"+search+"%");
+        }
+        request.setAttribute("users", users);
+        try {
+            dispatcher.forward(request, response);
+        } catch (ServletException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        }
 
     private void checkSignout(HttpServletRequest request, HttpServletResponse response) {
         HttpSession session=request.getSession();

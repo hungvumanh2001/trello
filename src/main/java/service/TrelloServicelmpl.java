@@ -94,11 +94,6 @@ public class TrelloServicelmpl implements TrelloService {
     }
 
     @Override
-    public Post findById(int id) {
-        return null;
-    }
-
-    @Override
     public void update(int id, User user) {
 
     }
@@ -109,8 +104,27 @@ public class TrelloServicelmpl implements TrelloService {
     }
 
     @Override
-    public List<Post> findByName(String name) {
-        return null;
+    public List<User> findByName(String username) {
+        List<User> users = new ArrayList<>();
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement("Select * from user where username like ?");) {
+            System.out.println(preparedStatement);
+            preparedStatement.setString(1, username);
+            ResultSet rs = preparedStatement.executeQuery();
+            while (rs.next()) {
+                int id = rs.getInt("id");
+                String password = rs.getString("password");
+                String email = rs.getString("email");
+                String fullname = rs.getString("fullname");
+                String address = rs.getString("address");
+                String phonenumber = rs.getString("phonenumber");
+                String role = rs.getString("role");
+                String status = rs.getString("status");
+                users.add(new User(id, username, password, email, fullname, address, phonenumber, role, status));
+            }
+        } catch (SQLException e) {
+        }
+        return users;
     }
 
 }
