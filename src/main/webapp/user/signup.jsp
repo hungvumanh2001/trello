@@ -23,7 +23,7 @@
         <div class="row justify-content-center">
             <div class="col-md-6 col-lg-4">
                 <div class="login-wrap p-0">
-                    <form action="/trellos" method="post" class="signin-form">
+                    <form action="/trellos" class="signin-form">
                         <div class="form-group">
                             <input name="name" type="text" class="form-control" placeholder="Username" required>
                         </div>

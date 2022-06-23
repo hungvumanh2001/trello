@@ -22,16 +22,32 @@ public class TrelloServlet extends HttpServlet {
         switch (action)
         {
             case "signin":
-                showLogin(request, response);
+                showSignin(request, response);
                 break;
             case "signup":
                 showSignup(request, response);
+                break;
+            case "signout":
+                checkSignout(request, response);
                 break;
             default:
                 showHome(request, response);
         }
 
 }
+
+    private void checkSignout(HttpServletRequest request, HttpServletResponse response) {
+        HttpSession session=request.getSession();
+        session.invalidate();
+        RequestDispatcher dispatcher = request.getRequestDispatcher("index.jsp");
+        try {
+            dispatcher.forward(request, response);
+        } catch (ServletException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     private void showSignup(HttpServletRequest request, HttpServletResponse response) {
@@ -45,7 +61,7 @@ public class TrelloServlet extends HttpServlet {
         }
     }
 
-    private void showLogin(HttpServletRequest request, HttpServletResponse response) {
+    private void showSignin(HttpServletRequest request, HttpServletResponse response) {
         RequestDispatcher requestDispatcher  = request.getRequestDispatcher("user/signin.jsp");
         try {
             requestDispatcher.forward(request,response);
@@ -58,30 +74,18 @@ public class TrelloServlet extends HttpServlet {
 
     private void showHome(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         RequestDispatcher requestDispatcher  = request.getRequestDispatcher("index.jsp");
+        String userSignin = request.getParameter("username");
+        if(userSignin!=null){
+            checkSignin(request, response);
+        }
+        String userSignup = request.getParameter("name");
+        if(userSignup!=null){
+            checkSignup(request, response);
+        }
         requestDispatcher.forward(request,response);
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-        if(action == null)
-        {
-            action ="";
-        }
-        switch (action)
-        {
-            case "signin":
-                checkLogin(request, response);
-                break;
-            case "signup":
-                checkSignup(request, response);
-                break;
-            default:
-                showHome(request, response);
-        }
-    }
-
-    private void checkLogin(HttpServletRequest request, HttpServletResponse response){
+    private void checkSignin(HttpServletRequest request, HttpServletResponse response){
         HttpSession session = request.getSession();
         String username = request.getParameter("username");
         String password = request.getParameter("password");
@@ -124,4 +128,24 @@ public class TrelloServlet extends HttpServlet {
             }
         }
     }
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        String action = request.getParameter("action");
+//        if(action == null)
+//        {
+//            action ="";
+//        }
+//        switch (action)
+//        {
+//            case "signin":
+//                checkLogin(request, response);
+//                break;
+//            case "signup":
+//                checkSignup(request, response);
+//                break;
+//            default:
+//                showHome(request, response);
+//        }
+    }
+
 }

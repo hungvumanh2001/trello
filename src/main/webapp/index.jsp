@@ -50,9 +50,12 @@
                     <a href="/trellos?action=signin" class="w3-bar-item w3-button">Sign in</a>
                     <a href="/trellos?action=signup" class="w3-bar-item w3-button">Sign up</a>
                 </c:if>
-                <c:if test="${sessionScope.user!=null}">
+                <c:if test="${sessionScope.user.role.equals('admin')}">
                     <a href="/trellos?action=listaccount" class="w3-bar-item w3-button">List Account</a>
-                    <a href="/trellos?action=signin" class="w3-bar-item w3-button">Sign out</a>
+                    <a href="/trellos?action=signout" class="w3-bar-item w3-button">Sign out</a>
+                </c:if>
+                <c:if test="${sessionScope.user.role.equals('user')}">
+                    <a href="/trellos?action=signout" class="w3-bar-item w3-button">Sign out</a>
                 </c:if>
             </div>
         </div>
